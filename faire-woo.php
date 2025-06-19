@@ -50,10 +50,10 @@ if (class_exists(\Automattic\WooCommerce\Utilities\FeaturesUtil::class)) {
  * Returns the main instance of FaireWoo.
  *
  * @since  1.0.0
- * @return FaireWoo\FaireWoo
+ * @return \FaireWoo\FaireWoo
  */
 function FaireWoo() {
-    return FaireWoo\FaireWoo::instance();
+    return \FaireWoo\FaireWoo::instance();
 }
 
 // Global for backwards compatibility

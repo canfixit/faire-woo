@@ -41,7 +41,16 @@ class Autoloader {
      * @return string
      */
     private function get_file_name_from_class($class) {
-        return 'class-' . str_replace('_', '-', strtolower($class)) . '.php';
+        // Convert class name to lowercase and replace underscores with hyphens
+        $file = strtolower($class);
+        $file = str_replace('_', '-', $file);
+        
+        // If this is the main class, handle it specially
+        if ($file === 'fairewoo') {
+            return 'class-faire-woo.php';
+        }
+        
+        return 'class-' . $file . '.php';
     }
 
     /**
@@ -64,19 +73,30 @@ class Autoloader {
      * @param string $class Class name.
      */
     public function autoload($class) {
+        // Convert namespace separators to directory separators
+        $class = str_replace('\\', '/', $class);
         $class = strtolower($class);
 
-        if (0 !== strpos($class, 'fairewoo\\')) {
+        if (0 !== strpos($class, 'fairewoo/')) {
             return;
         }
 
-        $class = str_replace('fairewoo\\', '', $class);
-        $class = str_replace('\\', '/', $class);
-        $file  = $this->get_file_name_from_class($class);
-        $path  = $this->include_path . $file;
+        // Remove the namespace prefix
+        $class = str_replace('fairewoo/', '', $class);
+        
+        // Get the file name
+        $file = $this->get_file_name_from_class(basename($class));
+        
+        // Get the path without the filename
+        $path = dirname($class);
+        if ($path !== '.') {
+            $path = $this->include_path . $path . '/' . $file;
+        } else {
+            $path = $this->include_path . $file;
+        }
 
         if (!$this->load_file($path)) {
-            // Try loading from subdirectories
+            // Try loading from subdirectories if not found in main directory
             $dirs = array('abstracts', 'interfaces', 'sync', 'api', 'admin');
             foreach ($dirs as $dir) {
                 if ($this->load_file($this->include_path . $dir . '/' . $file)) {
