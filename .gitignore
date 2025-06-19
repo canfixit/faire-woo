@@ -1,0 +1,59 @@
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+dev-debug.log
+
+# Dependency directories
+node_modules/
+
+# Environment variables
+.env
+
+# Editor directories and files
+.idea
+.vscode
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# OS specific
+.DS_Store
+
+# WordPress & PHP
+wp-content/uploads/
+wp-content/cache/
+wp-content/upgrade/
+wp-content/backups/
+wp-content/ai1wm-backups/
+wp-content/advanced-cache.php
+wp-content/object-cache.php
+wp-content/wp-cache-config.php
+wp-content/debug.log
+
+# Node & Composer
+vendor/
+composer.lock
+package-lock.json
+yarn.lock
+
+# Test & Coverage
+/tests/
+phpunit.xml
+coverage/
+
+# Taskmaster & Cursor
+.cursor/
+.taskmaster/
+
+# Misc
+.env.*
+*.swp
+*.swo
+*.bak
+*.tmp
+Thumbs.db

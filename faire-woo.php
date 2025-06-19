@@ -1,0 +1,51 @@
+/**
+ * Plugin Name: FaireWoo
+ * Plugin URI: https://github.com/username/faire-woo
+ * Description: WooCommerce plugin for Faire retailers to sync orders, products, and inventory.
+ * Version: 1.0.0
+ * Author: Your Name
+ * Author URI: https://github.com/username
+ * Text Domain: faire-woo
+ * Domain Path: /languages
+ * Requires at least: 5.8
+ * Requires PHP: 7.4
+ * WC requires at least: 5.0
+ * WC tested up to: 8.0
+ *
+ * @package FaireWoo
+ */
+
+defined('ABSPATH') || exit;
+
+if (!defined('FAIRE_WOO_PLUGIN_FILE')) {
+    define('FAIRE_WOO_PLUGIN_FILE', __FILE__);
+}
+
+if (!defined('FAIRE_WOO_PLUGIN_DIR')) {
+    define('FAIRE_WOO_PLUGIN_DIR', plugin_dir_path(__FILE__));
+}
+
+if (!defined('FAIRE_WOO_PLUGIN_URL')) {
+    define('FAIRE_WOO_PLUGIN_URL', plugin_dir_url(__FILE__));
+}
+
+// Ensure WooCommerce is active
+if (!in_array('woocommerce/woocommerce.php', apply_filters('active_plugins', get_option('active_plugins')))) {
+    return;
+}
+
+// Autoloader
+require_once FAIRE_WOO_PLUGIN_DIR . 'includes/class-faire-woo-autoloader.php';
+
+/**
+ * Returns the main instance of FaireWoo.
+ *
+ * @since  1.0.0
+ * @return FaireWoo\FaireWoo
+ */
+function FaireWoo() {
+    return FaireWoo\FaireWoo::instance();
+}
+
+// Global for backwards compatibility
+$GLOBALS['faire_woo'] = FaireWoo(); 
