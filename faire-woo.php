@@ -34,17 +34,19 @@ if (!defined('FAIRE_WOO_PLUGIN_URL')) {
 require_once FAIRE_WOO_PLUGIN_DIR . 'includes/class-faire-woo-autoloader.php';
 require_once FAIRE_WOO_PLUGIN_DIR . 'includes/class-faire-woo.php';
 
+// Declare HPOS compatibility
+add_action(
+    'before_woocommerce_init',
+    function () {
+        if (class_exists(\Automattic\WooCommerce\Utilities\FeaturesUtil::class)) {
+            \Automattic\WooCommerce\Utilities\FeaturesUtil::declare_compatibility('custom_order_tables', __FILE__, true);
+        }
+    }
+);
+
 // Ensure WooCommerce is active
 if (!in_array('woocommerce/woocommerce.php', apply_filters('active_plugins', get_option('active_plugins')))) {
     return;
-}
-
-if (class_exists(\Automattic\WooCommerce\Utilities\FeaturesUtil::class)) {
-    \Automattic\WooCommerce\Utilities\FeaturesUtil::declare_compatibility(
-        'custom_order_tables',
-        __FILE__,
-        true // Set to true if compatible
-    );
 }
 
 /**
