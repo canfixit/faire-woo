@@ -30,9 +30,11 @@ class BulkSyncPage {
 
     /**
      * Constructor.
+     *
+     * @param BulkSyncManager $sync_manager Bulk sync manager instance.
      */
-    public function __construct() {
-        $this->sync_manager = new BulkSyncManager();
+    public function __construct(BulkSyncManager $sync_manager) {
+        $this->sync_manager = $sync_manager;
         add_action('admin_menu', array($this, 'add_menu_item'));
         add_action('admin_post_faire_start_bulk_sync', array($this, 'handle_start_sync'));
         add_action('admin_post_faire_cancel_sync', array($this, 'handle_cancel_sync'));

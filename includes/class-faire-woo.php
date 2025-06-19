@@ -27,11 +27,19 @@ final class FaireWoo {
     protected static $instance = null;
 
     /**
-     * Order sync manager instance.
-     *
      * @var Sync\OrderSyncManager
      */
     public $order_sync = null;
+
+    /**
+     * @var Sync\BulkSyncManager
+     */
+    public $bulk_sync = null;
+    
+    /**
+     * @var Sync\ManualResolutionHandler
+     */
+    public $resolution_handler = null;
 
     /**
      * Main FaireWoo Instance.
@@ -82,24 +90,8 @@ final class FaireWoo {
      * Include required core files used in admin and on the frontend.
      */
     private function includes() {
-        // Interfaces
-        include_once FAIRE_WOO_ABSPATH . 'includes/interfaces/interface-order-comparator.php';
-        include_once FAIRE_WOO_ABSPATH . 'includes/interfaces/interface-conflict-resolver.php';
-
-        // Abstract classes
-        include_once FAIRE_WOO_ABSPATH . 'includes/abstracts/abstract-faire-woo-sync.php';
-
-        // Core classes
-        include_once FAIRE_WOO_ABSPATH . 'includes/sync/class-order-sync-manager.php';
-        include_once FAIRE_WOO_ABSPATH . 'includes/sync/class-order-comparator.php';
-        include_once FAIRE_WOO_ABSPATH . 'includes/sync/class-conflict-resolver.php';
-        include_once FAIRE_WOO_ABSPATH . 'includes/sync/class-conflict-resolution-config.php';
-        include_once FAIRE_WOO_ABSPATH . 'includes/sync/class-error-logger.php';
-        include_once FAIRE_WOO_ABSPATH . 'includes/sync/class-order-sync-state-machine.php';
-        include_once FAIRE_WOO_ABSPATH . 'includes/sync/class-order-sync-state-manager.php';
-        include_once FAIRE_WOO_ABSPATH . 'includes/sync/class-manual-resolution-handler.php';
-        include_once FAIRE_WOO_ABSPATH . 'includes/admin/class-manual-resolution-page.php';
-        include_once FAIRE_WOO_ABSPATH . 'includes/admin/class-bulk-sync-page.php';
+        // The autoloader handles all class loading.
+        // Manual includes are no longer necessary.
     }
 
     /**
@@ -117,17 +109,22 @@ final class FaireWoo {
      */
     public function init() {
         // Initialize components
-        $order_comparator = new Sync\OrderComparator();
-        $conflict_resolver = new Sync\ConflictResolver();
-        $error_logger = new Sync\ErrorLogger();
-        $state_machine = new Sync\OrderSyncStateMachine();
-        $state_manager = new Sync\OrderSyncStateManager($error_logger, $state_machine);
+        $error_logger       = new Sync\ErrorLogger();
+        $state_machine      = new Sync\OrderSyncStateMachine();
+        $state_manager      = new Sync\OrderSyncStateManager($error_logger, $state_machine);
+        $order_comparator   = new Sync\OrderComparator();
+        $conflict_resolver  = new Sync\ConflictResolver();
+        
         $this->order_sync = new Sync\OrderSyncManager(
             $order_comparator,
             $conflict_resolver,
             $error_logger,
             $state_manager
         );
+
+        $this->bulk_sync = new Sync\BulkSyncManager($this->order_sync);
+        $this->resolution_handler = new Sync\ManualResolutionHandler();
+
         $this->init_components();
     }
 
@@ -144,8 +141,8 @@ final class FaireWoo {
     private function init_components() {
         // Initialize admin components
         if (is_admin()) {
-            new ManualResolutionPage();
-            new BulkSyncPage();
+            new ManualResolutionPage($this->resolution_handler);
+            new BulkSyncPage($this->bulk_sync);
         }
 
         // Initialize other components

@@ -25,9 +25,11 @@ class ManualResolutionPage {
 
     /**
      * Constructor.
+     *
+     * @param ManualResolutionHandler $handler Resolution handler instance.
      */
-    public function __construct() {
-        $this->handler = new ManualResolutionHandler();
+    public function __construct(ManualResolutionHandler $handler) {
+        $this->handler = $handler;
         add_action('admin_menu', array($this, 'add_menu_item'));
         add_action('admin_post_faire_resolve_conflict', array($this, 'handle_resolution_submission'));
     }

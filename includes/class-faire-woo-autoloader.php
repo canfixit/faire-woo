@@ -70,40 +70,31 @@ class Autoloader {
     /**
      * Auto-load FaireWoo classes on demand.
      *
-     * @param string $class Class name.
+     * @param string $class The class name.
      */
     public function autoload($class) {
-        // Convert namespace separators to directory separators
-        $class = str_replace('\\', '/', $class);
-        $class = strtolower($class);
-
-        if (0 !== strpos($class, 'fairewoo/')) {
+        // Only autoload classes from this plugin's namespace.
+        if (0 !== strpos($class, 'FaireWoo\\')) {
             return;
         }
 
-        // Remove the namespace prefix
-        $class = str_replace('fairewoo/', '', $class);
+        // Remove the namespace prefix.
+        $relative_class = substr($class, strlen('FaireWoo\\'));
+
+        // Prepare the file name.
+        $file = 'class-' . str_replace('_', '-', strtolower(basename(str_replace('\\', '/', $relative_class)))) . '.php';
         
-        // Get the file name
-        $file = $this->get_file_name_from_class(basename($class));
-        
-        // Get the path without the filename
-        $path = dirname($class);
-        if ($path !== '.') {
-            $path = $this->include_path . $path . '/' . $file;
-        } else {
-            $path = $this->include_path . $file;
+        // Prepare the path.
+        $path_parts = explode('\\', strtolower($relative_class));
+        // Remove the class name part, leaving only the directory structure.
+        array_pop($path_parts); 
+        $path = '';
+        if (!empty($path_parts)) {
+            $path = implode('/', $path_parts) . '/';
         }
 
-        if (!$this->load_file($path)) {
-            // Try loading from subdirectories if not found in main directory
-            $dirs = array('abstracts', 'interfaces', 'sync', 'api', 'admin');
-            foreach ($dirs as $dir) {
-                if ($this->load_file($this->include_path . $dir . '/' . $file)) {
-                    return;
-                }
-            }
-        }
+        // Load the file.
+        $this->load_file($this->include_path . $path . $file);
     }
 }
 

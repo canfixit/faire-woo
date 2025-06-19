@@ -41,23 +41,11 @@ class BulkSyncManager {
 
     /**
      * Constructor.
+     * 
+     * @param OrderSyncManager $order_sync Order sync manager instance.
      */
-    public function __construct() {
-        // Initialize dependencies
-        $order_comparator = new OrderComparator();
-        $conflict_resolver = new ConflictResolver();
-        $error_logger = new ErrorLogger();
-        $state_machine = new OrderSyncStateMachine();
-        $state_manager = new OrderSyncStateManager($error_logger, $state_machine);
-
-        // Initialize OrderSyncManager with dependencies
-        $this->order_sync = new OrderSyncManager(
-            $order_comparator,
-            $conflict_resolver,
-            $error_logger,
-            $state_manager
-        );
-
+    public function __construct(OrderSyncManager $order_sync) {
+        $this->order_sync = $order_sync;
         add_action('faire_woo_process_sync_batch', array($this, 'process_batch'));
     }
 
