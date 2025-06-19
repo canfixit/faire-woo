@@ -30,13 +30,14 @@ if (!defined('FAIRE_WOO_PLUGIN_URL')) {
     define('FAIRE_WOO_PLUGIN_URL', plugin_dir_url(__FILE__));
 }
 
+// Include the autoloader and the main plugin class
+require_once FAIRE_WOO_PLUGIN_DIR . 'includes/class-faire-woo-autoloader.php';
+require_once FAIRE_WOO_PLUGIN_DIR . 'includes/class-faire-woo.php';
+
 // Ensure WooCommerce is active
 if (!in_array('woocommerce/woocommerce.php', apply_filters('active_plugins', get_option('active_plugins')))) {
     return;
 }
-
-// Autoloader
-require_once FAIRE_WOO_PLUGIN_DIR . 'includes/class-faire-woo-autoloader.php';
 
 if (class_exists(\Automattic\WooCommerce\Utilities\FeaturesUtil::class)) {
     \Automattic\WooCommerce\Utilities\FeaturesUtil::declare_compatibility(
