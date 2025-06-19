@@ -77,7 +77,7 @@ class Autoloader {
 
         if (!$this->load_file($path)) {
             // Try loading from subdirectories
-            $dirs = array('abstracts', 'interfaces', 'sync', 'api');
+            $dirs = array('abstracts', 'interfaces', 'sync', 'api', 'admin');
             foreach ($dirs as $dir) {
                 if ($this->load_file($this->include_path . $dir . '/' . $file)) {
                     return;

@@ -74,8 +74,8 @@ class ConflictResolver implements ConflictResolverInterface {
             );
         }
 
-        // Log the resolution process
-        $this->log_resolutions($wc_order->get_id(), $resolution_log);
+        // Log the resolution process (update to match interface)
+        $this->log_resolutions($wc_order, $faire_order, $resolution_log);
 
         return array(
             'resolved' => $resolved_data,
@@ -229,10 +229,12 @@ class ConflictResolver implements ConflictResolverInterface {
     /**
      * Log resolutions for an order.
      *
-     * @param int   $order_id Order ID.
-     * @param array $log      Resolution log entries.
+     * @param \WC_Order $wc_order    WooCommerce order object.
+     * @param array     $faire_order Faire order data.
+     * @param array     $resolutions Array of resolutions applied.
      */
-    private function log_resolutions($order_id, $log) {
+    public function log_resolutions(\WC_Order $wc_order, array $faire_order, array $resolutions) {
+        $order_id = $wc_order->get_id();
         $existing_log = get_post_meta($order_id, '_faire_resolution_log', true);
         if (!is_array($existing_log)) {
             $existing_log = array();
@@ -240,7 +242,8 @@ class ConflictResolver implements ConflictResolverInterface {
 
         $log_entry = array(
             'timestamp' => current_time('mysql'),
-            'resolutions' => $log,
+            'resolutions' => $resolutions,
+            // Optionally, you could add 'faire_order' => $faire_order,
         );
 
         array_push($existing_log, $log_entry);
@@ -263,5 +266,45 @@ class ConflictResolver implements ConflictResolverInterface {
             return false;
         }
         return empty($value) && $value !== '0' && $value !== 0;
+    }
+
+    /**
+     * Resolve a specific field conflict.
+     *
+     * @param string    $field       Field name with conflict.
+     * @param \WC_Order $wc_order    WooCommerce order object.
+     * @param array     $faire_order Faire order data.
+     * @param array     $difference  The specific difference data for this field.
+     * @return array Array containing resolved value and action taken.
+     */
+    public function resolve_field_conflict($field, \WC_Order $wc_order, array $faire_order, array $difference) {
+        // Stub implementation
+        return [
+            'resolved_value' => null,
+            'action' => 'not_implemented'
+        ];
+    }
+
+    /**
+     * Get resolution strategy for a specific field.
+     *
+     * @param string $field Field name.
+     * @return string Strategy to use ('wc_wins', 'faire_wins', 'newer_wins', 'manual').
+     */
+    public function get_field_resolution_strategy($field) {
+        // Stub implementation
+        return 'faire_wins';
+    }
+
+    /**
+     * Apply resolved values to the WooCommerce order.
+     *
+     * @param \WC_Order $wc_order       WooCommerce order object.
+     * @param array     $resolved_values Array of resolved values to apply.
+     * @return bool True if successful, false otherwise.
+     */
+    public function apply_resolved_values(\WC_Order $wc_order, array $resolved_values) {
+        // Stub implementation
+        return true;
     }
 } 

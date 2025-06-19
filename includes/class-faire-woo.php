@@ -93,6 +93,13 @@ final class FaireWoo {
         include_once FAIRE_WOO_ABSPATH . 'includes/sync/class-order-sync-manager.php';
         include_once FAIRE_WOO_ABSPATH . 'includes/sync/class-order-comparator.php';
         include_once FAIRE_WOO_ABSPATH . 'includes/sync/class-conflict-resolver.php';
+        include_once FAIRE_WOO_ABSPATH . 'includes/sync/class-conflict-resolution-config.php';
+        include_once FAIRE_WOO_ABSPATH . 'includes/sync/class-error-logger.php';
+        include_once FAIRE_WOO_ABSPATH . 'includes/sync/class-order-sync-state-machine.php';
+        include_once FAIRE_WOO_ABSPATH . 'includes/sync/class-order-sync-state-manager.php';
+        include_once FAIRE_WOO_ABSPATH . 'includes/sync/class-manual-resolution-handler.php';
+        include_once FAIRE_WOO_ABSPATH . 'includes/admin/class-manual-resolution-page.php';
+        include_once FAIRE_WOO_ABSPATH . 'includes/admin/class-bulk-sync-page.php';
     }
 
     /**
@@ -110,7 +117,17 @@ final class FaireWoo {
      */
     public function init() {
         // Initialize components
-        $this->order_sync = new Sync\OrderSyncManager();
+        $order_comparator = new Sync\OrderComparator();
+        $conflict_resolver = new Sync\ConflictResolver();
+        $error_logger = new Sync\ErrorLogger();
+        $state_machine = new Sync\OrderSyncStateMachine();
+        $state_manager = new Sync\OrderSyncStateManager($error_logger, $state_machine);
+        $this->order_sync = new Sync\OrderSyncManager(
+            $order_comparator,
+            $conflict_resolver,
+            $error_logger,
+            $state_manager
+        );
         $this->init_components();
     }
 
