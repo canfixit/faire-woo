@@ -25,46 +25,8 @@ class Autoloader {
      * The Constructor.
      */
     public function __construct() {
-        if (function_exists('__autoload')) {
-            spl_autoload_register('__autoload');
-        }
-
         spl_autoload_register(array($this, 'autoload'));
-
-        $this->include_path = untrailingslashit(plugin_dir_path(FAIRE_WOO_PLUGIN_FILE)) . '/includes/';
-    }
-
-    /**
-     * Take a class name and turn it into a file name.
-     *
-     * @param  string $class Class name.
-     * @return string
-     */
-    private function get_file_name_from_class($class) {
-        // Convert class name to lowercase and replace underscores with hyphens
-        $file = strtolower($class);
-        $file = str_replace('_', '-', $file);
-        
-        // If this is the main class, handle it specially
-        if ($file === 'fairewoo') {
-            return 'class-faire-woo.php';
-        }
-        
-        return 'class-' . $file . '.php';
-    }
-
-    /**
-     * Include a class file.
-     *
-     * @param  string $path File path.
-     * @return bool Successful or not.
-     */
-    private function load_file($path) {
-        if ($path && is_readable($path)) {
-            include_once $path;
-            return true;
-        }
-        return false;
+        $this->include_path = FAIRE_WOO_PLUGIN_DIR . 'includes/';
     }
 
     /**
@@ -73,28 +35,38 @@ class Autoloader {
      * @param string $class The class name.
      */
     public function autoload($class) {
-        // Only autoload classes from this plugin's namespace.
-        if (0 !== strpos($class, 'FaireWoo\\')) {
+        // Project-specific namespace prefix
+        $prefix = 'FaireWoo\\';
+
+        // Does the class use the namespace prefix?
+        $len = strlen($prefix);
+        if (strncmp($prefix, $class, $len) !== 0) {
+            // No, move to the next registered autoloader
             return;
         }
 
-        // Remove the namespace prefix.
-        $relative_class = substr($class, strlen('FaireWoo\\'));
+        // Get the relative class name
+        $relative_class = substr($class, $len);
 
-        // Prepare the file name.
-        $file = 'class-' . str_replace('_', '-', strtolower(basename(str_replace('\\', '/', $relative_class)))) . '.php';
+        // Replace the namespace prefix with the base directory, replace namespace
+        // separators with directory separators in the relative class name, append
+        // with .php
+        $file = 'class-' . str_replace('_', '-', strtolower(basename(str_replace('\\', '/', $class)))) . '.php';
         
-        // Prepare the path.
+        // Prepare the path
         $path_parts = explode('\\', strtolower($relative_class));
-        // Remove the class name part, leaving only the directory structure.
-        array_pop($path_parts); 
+        array_pop($path_parts); // Remove class name
         $path = '';
         if (!empty($path_parts)) {
             $path = implode('/', $path_parts) . '/';
         }
-
-        // Load the file.
-        $this->load_file($this->include_path . $path . $file);
+        
+        $file_path = $this->include_path . $path . $file;
+        
+        // if the file exists, require it
+        if (file_exists($file_path)) {
+            require $file_path;
+        }
     }
 }
 
