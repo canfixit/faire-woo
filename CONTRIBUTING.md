@@ -17,7 +17,7 @@ Thank you for your interest in contributing to FaireWoo! Your help is greatly ap
 - Add docblocks for all classes and methods.
 
 ## Reporting Issues
-- Please use the [GitHub Issues](https://github.com/yourusername/faire-woo/issues) page to report bugs or request features.
+- Please use the [GitHub Issues](https://github.com/canfixit/faire-woo/issues) page to report bugs or request features.
 - Include as much detail as possible (steps to reproduce, environment, screenshots, etc.).
 
 ## Community
