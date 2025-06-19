@@ -35,35 +35,33 @@ class Autoloader {
      * @param string $class The class name.
      */
     public function autoload($class) {
-        // Project-specific namespace prefix
         $prefix = 'FaireWoo\\';
-
-        // Does the class use the namespace prefix?
         $len = strlen($prefix);
+
+        // Not a class from this plugin.
         if (strncmp($prefix, $class, $len) !== 0) {
-            // No, move to the next registered autoloader
             return;
         }
 
-        // Get the relative class name
+        // Get the relative class name. E.g., "Sync\OrderSyncManager"
         $relative_class = substr($class, $len);
 
-        // Replace the namespace prefix with the base directory, replace namespace
-        // separators with directory separators in the relative class name, append
-        // with .php
-        $file = 'class-' . str_replace('_', '-', strtolower(basename(str_replace('\\', '/', $class)))) . '.php';
+        $parts = explode('\\', $relative_class);
+        $class_name = array_pop($parts);
+
+        // Convert the class name from CamelCase to kebab-case for the filename.
+        // E.g., "OrderSyncManager" -> "order-sync-manager"
+        $file_name_kebab = strtolower(preg_replace('/(?<!^)([A-Z])/', '-$1', $class_name));
+        $file_name = 'class-' . $file_name_kebab . '.php';
         
-        // Prepare the path
-        $path_parts = explode('\\', strtolower($relative_class));
-        array_pop($path_parts); // Remove class name
+        // Convert namespace parts to a directory path.
         $path = '';
-        if (!empty($path_parts)) {
-            $path = implode('/', $path_parts) . '/';
+        if (!empty($parts)) {
+            $path = strtolower(implode('/', $parts)) . '/';
         }
+
+        $file_path = $this->include_path . $path . $file_name;
         
-        $file_path = $this->include_path . $path . $file;
-        
-        // if the file exists, require it
         if (file_exists($file_path)) {
             require $file_path;
         }
