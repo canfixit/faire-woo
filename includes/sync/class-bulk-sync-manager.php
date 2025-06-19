@@ -8,6 +8,12 @@
 
 namespace FaireWoo\Sync;
 
+use FaireWoo\Sync\OrderComparator;
+use FaireWoo\Sync\ConflictResolver;
+use FaireWoo\Sync\ErrorLogger;
+use FaireWoo\Sync\OrderSyncStateMachine;
+use FaireWoo\Sync\OrderSyncStateManager;
+
 defined('ABSPATH') || exit;
 
 /**
@@ -37,7 +43,21 @@ class BulkSyncManager {
      * Constructor.
      */
     public function __construct() {
-        $this->order_sync = new OrderSyncManager();
+        // Initialize dependencies
+        $order_comparator = new OrderComparator();
+        $conflict_resolver = new ConflictResolver();
+        $error_logger = new ErrorLogger();
+        $state_machine = new OrderSyncStateMachine();
+        $state_manager = new OrderSyncStateManager($error_logger, $state_machine);
+
+        // Initialize OrderSyncManager with dependencies
+        $this->order_sync = new OrderSyncManager(
+            $order_comparator,
+            $conflict_resolver,
+            $error_logger,
+            $state_manager
+        );
+
         add_action('faire_woo_process_sync_batch', array($this, 'process_batch'));
     }
 

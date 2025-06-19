@@ -9,6 +9,11 @@
 namespace FaireWoo\Admin;
 
 use FaireWoo\Sync\BulkSyncManager;
+use FaireWoo\Sync\OrderComparator;
+use FaireWoo\Sync\ConflictResolver;
+use FaireWoo\Sync\ErrorLogger;
+use FaireWoo\Sync\OrderSyncStateMachine;
+use FaireWoo\Sync\OrderSyncStateManager;
 
 defined('ABSPATH') || exit;
 
