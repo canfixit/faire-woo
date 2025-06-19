@@ -1,3 +1,4 @@
+<?php
 /**
  * Plugin Name: FaireWoo
  * Plugin URI: https://github.com/canfixit/faire-woo
