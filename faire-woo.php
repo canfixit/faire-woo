@@ -37,6 +37,14 @@ if (!in_array('woocommerce/woocommerce.php', apply_filters('active_plugins', get
 // Autoloader
 require_once FAIRE_WOO_PLUGIN_DIR . 'includes/class-faire-woo-autoloader.php';
 
+if (class_exists(\Automattic\WooCommerce\Utilities\FeaturesUtil::class)) {
+    \Automattic\WooCommerce\Utilities\FeaturesUtil::declare_compatibility(
+        'custom_order_tables',
+        __FILE__,
+        true // Set to true if compatible
+    );
+}
+
 /**
  * Returns the main instance of FaireWoo.
  *

@@ -449,28 +449,39 @@ class OrderSyncManager extends FaireWooSync {
      * @return array Array of WooCommerce order IDs.
      */
     public function get_orders_needing_sync($limit = 50) {
-        global $wpdb;
+        // Get all WooCommerce order IDs (regardless of storage engine)
+        $args = array(
+            'limit'        => $limit * 2, // Fetch extra in case some are already synced
+            'status'       => 'any',
+            'return'       => 'ids',
+            'orderby'      => 'date',
+            'order'        => 'DESC',
+        );
+        $all_order_ids = wc_get_orders($args);
 
-        // Get orders that have never been synced
-        $never_synced = $wpdb->get_col($wpdb->prepare(
-            "SELECT posts.ID FROM {$wpdb->posts} posts
-            LEFT JOIN {$wpdb->prefix}" . OrderSyncStateManager::TABLE_NAME . " states
-            ON posts.ID = states.wc_order_id
-            WHERE posts.post_type = 'shop_order'
-            AND states.wc_order_id IS NULL
-            LIMIT %d",
-            $limit
-        ));
+        // Filter out orders that have already been synced (exist in state table)
+        $never_synced = array();
+        global $wpdb;
+        $state_table = $wpdb->prefix . OrderSyncStateManager::TABLE_NAME;
+        foreach ($all_order_ids as $order_id) {
+            $exists = $wpdb->get_var($wpdb->prepare(
+                "SELECT 1 FROM {$state_table} WHERE order_id = %s LIMIT 1",
+                $order_id
+            ));
+            if (!$exists) {
+                $never_synced[] = $order_id;
+                if (count($never_synced) >= $limit) {
+                    break;
+                }
+            }
+        }
 
         // Get orders that need retry
         $need_retry = $this->state_manager->get_recoverable_orders($limit);
 
         // Get orders in conflict state that have been resolved
         $resolved_conflicts = $wpdb->get_col($wpdb->prepare(
-            "SELECT wc_order_id FROM {$wpdb->prefix}" . OrderSyncStateManager::TABLE_NAME . "
-            WHERE state = %s
-            AND metadata LIKE %s
-            LIMIT %d",
+            "SELECT wc_order_id FROM {$state_table} WHERE state = %s AND metadata LIKE %s LIMIT %d",
             OrderSyncStateMachine::STATE_CONFLICT,
             '%"resolved":true%',
             $limit
