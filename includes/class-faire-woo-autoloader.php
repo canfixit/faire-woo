@@ -38,23 +38,30 @@ class Autoloader {
         $prefix = 'FaireWoo\\';
         $len = strlen($prefix);
 
-        // Not a class from this plugin.
         if (strncmp($prefix, $class, $len) !== 0) {
             return;
         }
 
-        // Get the relative class name. E.g., "Sync\OrderSyncManager"
         $relative_class = substr($class, $len);
-
         $parts = explode('\\', $relative_class);
         $class_name = array_pop($parts);
 
-        // Convert the class name from CamelCase to kebab-case for the filename.
-        // E.g., "OrderSyncManager" -> "order-sync-manager"
+        // Determine the file prefix based on namespace
+        $file_prefix = 'class-';
+        if (!empty($parts)) {
+            $first_namespace_part = strtolower($parts[0]);
+            if ($first_namespace_part === 'abstracts') {
+                $file_prefix = 'abstract-';
+            } elseif ($first_namespace_part === 'interfaces') {
+                $file_prefix = 'interface-';
+            }
+        }
+
+        // Convert class name to kebab-case
         $file_name_kebab = strtolower(preg_replace('/(?<!^)([A-Z])/', '-$1', $class_name));
-        $file_name = 'class-' . $file_name_kebab . '.php';
+        $file_name = $file_prefix . $file_name_kebab . '.php';
         
-        // Convert namespace parts to a directory path.
+        // Convert namespace parts to a directory path
         $path = '';
         if (!empty($parts)) {
             $path = strtolower(implode('/', $parts)) . '/';
