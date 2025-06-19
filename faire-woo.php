@@ -1,10 +1,10 @@
 /**
  * Plugin Name: FaireWoo
- * Plugin URI: https://github.com/username/faire-woo
+ * Plugin URI: https://github.com/canfixit/faire-woo
  * Description: WooCommerce plugin for Faire retailers to sync orders, products, and inventory.
  * Version: 1.0.0
- * Author: Your Name
- * Author URI: https://github.com/username
+ * Author: Haibin Li
+ * Author URI: https://github.com/canfixit
  * Text Domain: faire-woo
  * Domain Path: /languages
  * Requires at least: 5.8
