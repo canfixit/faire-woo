@@ -19,7 +19,7 @@ WooCommerce plugin for Faire retailers to seamlessly sync products, orders, and 
 ## Installation
 1. Download or clone this repository to your `wp-content/plugins` directory:
    ```sh
-   git clone https://github.com/yourusername/faire-woo.git
+   git clone https://github.com/canfixit/faire-woo.git
    ```
 2. Activate **FaireWoo** from the WordPress Plugins admin page.
 3. Ensure WooCommerce is active and configured.
