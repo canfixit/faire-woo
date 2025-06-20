@@ -46,7 +46,7 @@ class BulkSyncPage {
      */
     public function add_menu_item() {
         add_submenu_page(
-            'woocommerce',
+            'faire-woo-main',
             'Faire Bulk Sync',
             'Faire Bulk Sync',
             'manage_woocommerce',

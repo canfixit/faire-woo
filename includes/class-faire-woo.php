@@ -12,6 +12,7 @@ defined('ABSPATH') || exit;
 
 use FaireWoo\Admin\ManualResolutionPage;
 use FaireWoo\Admin\BulkSyncPage;
+use FaireWoo\Admin\SettingsPage;
 
 /**
  * Main FaireWoo Class.
@@ -141,11 +142,28 @@ final class FaireWoo {
     private function init_components() {
         // Initialize admin components
         if (is_admin()) {
+            add_action('admin_menu', array($this, 'add_admin_menu'));
+            new SettingsPage();
             new ManualResolutionPage($this->resolution_handler);
             new BulkSyncPage($this->bulk_sync);
         }
 
         // Initialize other components
         // ... existing component initialization code ...
+    }
+    
+    /**
+     * Add admin menu.
+     */
+    public function add_admin_menu() {
+        add_menu_page(
+            'FaireWoo',
+            'FaireWoo',
+            'manage_woocommerce',
+            'faire-woo-main',
+            null,
+            'dashicons-store',
+            56
+        );
     }
 } 
